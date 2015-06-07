@@ -1,0 +1,7 @@
+*.pyc
+*.pyo
+*.o
+*.so
+*.dylib
+*.egg-info
+.idea
