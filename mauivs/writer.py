@@ -7,6 +7,16 @@ __author__ = 'christoph.statz <at> tu-dresden.de'
 import numpy as np
 from .helper import *
 
+import argparse
+parser = argparse.ArgumentParser("maui-vs")
+parser.add_argument("--h5collective", action='store_true')
+args, _ = parser.parse_known_args()
+
+H5P_COLLECTIVE = False
+
+if args.h5collective:
+    H5P_COLLECTIVE = True
+
 
 class VSWriter(object):
 
@@ -83,11 +93,8 @@ class VSWriter(object):
                     tmp += "}"
                     derived_vars.attrs[self.__name] = np.string_(tmp)
 
-            try:
-                base['time']
+            if 'time' in base:
                 test.attrs["vsTimeGroup"] = np.string_("/time")
-            except KeyError:
-                pass
 
             test.attrs["vsMD"] = np.string_(self.__name)
             datasets[key] = test
@@ -100,9 +107,18 @@ class VSWriter(object):
         for key in self.__data.keys():
             data_shape = []
             for i in range(len(key)):
-                mesh_groups[key]["axis"+str(i)][:] = self.__domains[key].mesh.axes[i][:]
 
-            datasets[key][:] = self.__data[key][:]
+                if H5P_COLLECTIVE:
+                    with mesh_groups[key]["axis"+str(i)].collective:
+                        mesh_groups[key]["axis"+str(i)][:] = self.__domains[key].mesh.axes[i][:]
+                else:
+                    mesh_groups[key]["axis"+str(i)][:] = self.__domains[key].mesh.axes[i][:]
+
+            if H5P_COLLECTIVE:
+                with datasets[key].collective:
+                    datasets[key][:] = self.__data[key][:]
+            else:
+                datasets[key][:] = self.__data[key][:]
 
         # delete groups and datasets before closing the file!
         for d in datasets.values():
@@ -110,12 +126,12 @@ class VSWriter(object):
                 del d
             except UnboundLocalError:
                 pass
-    
+
         try:
            del datasets
         except UnboundLocalError:
            pass
-        
+
         try:
            del var_group
         except UnboundLocalError:

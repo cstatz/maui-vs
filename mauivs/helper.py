@@ -39,7 +39,7 @@ def generate_dirname(prefix, coordinate):
 
     tmp = ''
 
-    for i, k  in enumerate(coordinate):
+    for i, k in enumerate(coordinate):
         tmp += str(k)
         if i < len(coordinate)-1:
             tmp += '_'

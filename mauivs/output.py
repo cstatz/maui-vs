@@ -106,7 +106,7 @@ class VSOutput(object):
         for field in self.__fields:
             if not (self.__omit and self.__local_only):
                 self.__writer.append(VSWriter(field.partition.domains, field.d, field.partition.meta_data,
-                                               var_name=field.name, var_type=field.rank, var_unit=field.unit, local_only=self.__local_only))
+                    var_name=field.name, var_type=field.rank, var_unit=field.unit, local_only=self.__local_only))
 
         self.__cycle = 0
 
@@ -137,6 +137,8 @@ class VSOutput(object):
 
         if cycle is not None:
             filename += "_%07d" % cycle
+
+        base = None
 
         if hasattr(context, 'comm'):
             if not self.__local_only:
