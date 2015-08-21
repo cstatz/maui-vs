@@ -128,14 +128,14 @@ class VSWriter(object):
                 pass
 
         try:
-           del datasets
+            del datasets
         except UnboundLocalError:
-           pass
+            pass
 
         try:
-           del var_group
+            del var_group
         except UnboundLocalError:
-           pass
+            pass
 
         try:
             del mesh_group
